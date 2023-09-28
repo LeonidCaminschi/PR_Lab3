@@ -2,13 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
+
 def webcrawl(url, page=1):
     list_of_urls = set()
 
     try:
         # Send a GET request to the URL
-        response = requests.get(url + str(page))
-        print(url + str(page))
+        response = requests.get(url + "?page=" + str(page))
+        print(url + "?page=" + str(page))
 
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
@@ -23,7 +24,7 @@ def webcrawl(url, page=1):
             for link in links:
                 href = link.get('href')
                 if href is not None and regex.match(href):
-                    list_of_urls.add(href)
+                    list_of_urls.add("https://999.md" + href)
 
             if len(list_of_urls) == 0:
                 return list_of_urls
