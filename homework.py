@@ -1,7 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
-def parsehtml(div1, attributes):
+def parsehtml(div1):
+    attributes = ""
     for div in div1:
         ul_elements = div.find_all("ul")
         if ul_elements:
@@ -11,6 +12,7 @@ def parsehtml(div1, attributes):
                     for li in li_elements:
                         span = li.find_all('span')
                         if span:
+                            key_value = []
                             for spa in span:
                                 a = spa.find('a')
                                 if a:
@@ -18,10 +20,18 @@ def parsehtml(div1, attributes):
                                 else:
                                     text = spa.text
 
-                                attributes += text
-                                print(text + " ", end="")
-                            print()
-
+                                key_value.append(text)
+                            
+                            # print(key_value)
+                            if(len(key_value) == 2):    
+                                attributes += (str(key_value[0]) + ": " + str(key_value[1]) + ", ")
+                            elif(len(key_value) == 1):
+                                attributes += (str(key_value[0]) + ", ")
+                            else:
+                                pass
+                            return attributes
+                            #     print(text + " ", end="")
+                            # print("")
 def analyzeproduct(url):
     try:
         # Send a GET request to the URL
@@ -41,8 +51,9 @@ def analyzeproduct(url):
 
             # Extract and print the divs with data
             attributes = ""
-            parsehtml(div1, attributes)
-            parsehtml(div2, attributes)
+            attributes += str(parsehtml(div1))
+            attributes += str(parsehtml(div2))
+            print(attributes)
             return attributes
         else:
             print(f"Failed to retrieve the web page. Status code: {response.status_code}")
