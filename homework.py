@@ -1,7 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import mariadb
-import sys
 
 def parsehtml(div1, attributes):
     for div in div1:
@@ -21,8 +19,8 @@ def parsehtml(div1, attributes):
                                     text = spa.text
 
                                 attributes += text
-                                # print(text + " ", end="")
-                            # print()
+                                print(text + " ", end="")
+                            print()
 
 def analyzeproduct(url):
     try:
@@ -45,27 +43,7 @@ def analyzeproduct(url):
             attributes = ""
             parsehtml(div1, attributes)
             parsehtml(div2, attributes)
-
-            # Connect to MariaDB Platform
-            try:
-                conn = mariadb.connect(
-                    user="leonidas",
-                    password="",
-                    host="localhost",
-                    port=3306,
-                    database="999data"
-                )
-            except mariadb.Error as e:
-                print(f"Error connecting to MariaDB Platform: {e}")
-                sys.exit(1)
-
-            # Get Cursor
-            cur = conn.cursor()
-            try:
-                cur.execute("INSERT INTO laptops (link, attributes) VALUES (?, ?)", (url, attributes))
-            except mariadb.Error as e:
-                print(f"Error inserting into MariaDB Platform: {e}")
-                sys.exit(1)
+            return attributes
         else:
             print(f"Failed to retrieve the web page. Status code: {response.status_code}")
 

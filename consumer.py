@@ -21,7 +21,7 @@ def consumer(name):
 
     def callback(ch, method, properties, body):
         print(f"{name} Received {body.decode()}")
-        analyzeproduct(f'{body.decode()}')
+        attr = analyzeproduct(f'{body.decode()}')
         print(f"{name} Done")
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
