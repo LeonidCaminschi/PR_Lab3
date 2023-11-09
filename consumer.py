@@ -4,6 +4,15 @@ from homework import analyzeproduct
 import concurrent.futures
 import signal
 import sys
+from tinydb import TinyDB 
+import threading
+
+db = TinyDB('database.json')
+db_lock = threading.Lock()
+
+def save_to_db(body, attr):
+    with db_lock:
+        db.insert({'body': body, 'attr': attr})
 
 def consumer(name):
     connection = pika.BlockingConnection(
@@ -22,6 +31,7 @@ def consumer(name):
     def callback(ch, method, properties, body):
         print(f"{name} Received {body.decode()}")
         attr = analyzeproduct(f'{body.decode()}')
+        save_to_db(body.decode(), attr)
         print(f"{name} Done")
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
