@@ -1,8 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
+import mariadb
+import sys
 
-
-def parsehtml(div1):
+def parsehtml(div1, attributes):
     for div in div1:
         ul_elements = div.find_all("ul")
         if ul_elements:
@@ -19,14 +20,15 @@ def parsehtml(div1):
                                 else:
                                     text = spa.text
 
-                                print(text + " ", end="")
-                            print()
+                                attributes += text
+                                # print(text + " ", end="")
+                            # print()
 
 def analyzeproduct(url):
     try:
         # Send a GET request to the URL
         response = requests.get(url)
-        print(url)
+        # print(url)
 
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
@@ -40,9 +42,30 @@ def analyzeproduct(url):
             # print(div2)
 
             # Extract and print the divs with data
-            parsehtml(div1)
-            parsehtml(div2)
+            attributes = ""
+            parsehtml(div1, attributes)
+            parsehtml(div2, attributes)
 
+            # Connect to MariaDB Platform
+            try:
+                conn = mariadb.connect(
+                    user="leonidas",
+                    password="",
+                    host="localhost",
+                    port=3306,
+                    database="999data"
+                )
+            except mariadb.Error as e:
+                print(f"Error connecting to MariaDB Platform: {e}")
+                sys.exit(1)
+
+            # Get Cursor
+            cur = conn.cursor()
+            try:
+                cur.execute("INSERT INTO laptops (link, attributes) VALUES (?, ?)", (url, attributes))
+            except mariadb.Error as e:
+                print(f"Error inserting into MariaDB Platform: {e}")
+                sys.exit(1)
         else:
             print(f"Failed to retrieve the web page. Status code: {response.status_code}")
 
